@@ -1,6 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Login } from '../Libs/Login';
 import { ApiService } from '../api.service';
+import { environment } from 'src/environments/environment';
+import { ActivatedRoute } from '@angular/router';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 /**
  * Class For Header Component (DO Eager Loading)
@@ -39,26 +42,60 @@ export class HeaderComponent implements OnInit {
    * Constructor for Header
    * @param api API Service
    */
-  constructor(private api: ApiService) { }
+  constructor(
+    private api: ApiService,
+    private aroute: ActivatedRoute,
+    
+  ) { }
   /**
    * On Init
    */
   ngOnInit() {
     // Get Login Token
-    this.token = Login.getToken();
+    if (environment.production == false) {
+      this.aroute.queryParams.subscribe((paramData: any) => {
+        if (paramData.token != null) {
+          console.log(paramData.token);
+          // Login.getToken(paramData.token);
+          localStorage.setItem('esim_token', paramData.token);
+          // Get Login Token
+          this.token = Login.getToken();
 
+          // If token is available then get username
+          if (this.token) {
+            this.api.userInfo(this.token).subscribe((v) => {
+              this.username = v.username;
+            }, (err) => {
+              console.log(err.status)
+              console.log(err);
+              // if (err.status === 401) {
+              // Login.logout();
+              // }
+            });
+          }
+        } else {
+          console.log("hi");
+        }
+      });
+    }
+
+    // If token is available then get username
+    // Get Login Token
+    this.token = Login.getToken();
+    // console.log(this.token);
     // If token is available then get username
     if (this.token) {
       this.api.userInfo(this.token).subscribe((v) => {
         this.username = v.username;
       }, (err) => {
-        // console.log(err.status)
+        console.log(err.status)
         console.log(err);
         // if (err.status === 401) {
-        Login.logout();
+        // Login.logout();
         // }
       });
     }
+
     // Initializing window
     this.window = window;
   }

@@ -17,6 +17,7 @@ import { AlertService } from '../alert/alert-service/alert.service';
 import { LayoutUtils } from '../layout/ArduinoCanvasInterface';
 import { ExportJSONDialogComponent } from '../export-jsondialog/export-jsondialog.component';
 import { ExitConfirmDialogComponent } from '../exit-confirm-dialog/exit-confirm-dialog.component';
+import { HideworkspaceService } from '../Libs/hideworkspace.service';
 /**
  * Declare Raphael so that build don't throws error
  */
@@ -100,6 +101,7 @@ export class SimulatorComponent implements OnInit, OnDestroy {
    * Is autolayout in progress?
    */
   isAutoLayoutInProgress = false;
+
   /**
    * Simulator Component constructor
    * @param aroute Activated Route
@@ -117,6 +119,7 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     private router: Router,
     private api: ApiService,
     private alertService: AlertService,
+    private hideWorkSpaceService: HideworkspaceService
   ) {
     // Initialize Global Variables
     Workspace.initializeGlobalFunctions();
@@ -203,25 +206,44 @@ export class SimulatorComponent implements OnInit, OnDestroy {
     /**
      * Initialize Event Listeners -> Workspace.ts File Contains all the event listeners
      */
+
+
     const holder = document.getElementById('holder');
-    holder.addEventListener('click', Workspace.click, true);
-    holder.addEventListener('mousedown', Workspace.mouseDown, true);
-    holder.addEventListener('mousemove', Workspace.mouseMove, true);
-    holder.addEventListener('mouseup', Workspace.mouseUp, true);
-    holder.addEventListener('contextmenu', Workspace.contextMenu, true);
-    holder.addEventListener('copy', Workspace.copy, true);
-    holder.addEventListener('cut', Workspace.cut, true);
-    holder.addEventListener('dblclick', Workspace.doubleClick, true);
-    holder.addEventListener('dragleave', Workspace.dragLeave, true);
-    holder.addEventListener('dragover', Workspace.dragOver, true);
-    holder.addEventListener('drop', Workspace.drop, true);
-    holder.addEventListener('wheel', Workspace.mouseWheel, true);
-    holder.addEventListener('paste', Workspace.paste, true);
-    document.body.addEventListener('mousemove', Workspace.bodyMouseMove);
-    document.body.addEventListener('mouseup', Workspace.bodyMouseUp);
-    document.body.addEventListener('keydown', Workspace.keyDown, true);
-    document.body.addEventListener('keypress', Workspace.keyPress, true);
-    document.body.addEventListener('keyup', Workspace.keyUp, true);
+    this.hideWorkSpaceService.isSimulationStart.subscribe((res: boolean) => {
+      console.log(res);
+      console.log("Call")
+      if (res == true) {
+        holder.addEventListener('click', Workspace.click, true);
+        holder.addEventListener('mousedown', Workspace.mouseDown, true);
+        holder.addEventListener('mousemove', Workspace.mouseMove, true);
+        holder.addEventListener('mouseup', Workspace.mouseUp, true);
+        holder.addEventListener('contextmenu', Workspace.contextMenu, true);
+        holder.addEventListener('copy', Workspace.copy, true);
+        holder.addEventListener('cut', Workspace.cut, true);
+        holder.addEventListener('dblclick', Workspace.doubleClick, true);
+        holder.addEventListener('dragleave', Workspace.dragLeave, true);
+        holder.addEventListener('dragover', Workspace.dragOver, true);
+        holder.addEventListener('drop', Workspace.drop, true);
+        holder.addEventListener('wheel', Workspace.mouseWheel, true);
+        holder.addEventListener('paste', Workspace.paste, true);
+        document.body.addEventListener('mousemove', Workspace.bodyMouseMove);
+        document.body.addEventListener('mouseup', Workspace.bodyMouseUp);
+        document.body.addEventListener('keydown', Workspace.keyDown, true);
+        document.body.addEventListener('keypress', Workspace.keyPress, true);
+        document.body.addEventListener('keyup', Workspace.keyUp, true);
+
+      } else {
+        // console.log("stop")
+        // // Workspace.hideContextMenu();
+        // // document.body.addEventListener('keydown', Workspace.keyDown, true);
+        holder.addEventListener('contextmenu',Workspace.hideContextMenu,true);
+        // // document.getElementById('contextMenu').style.display = 'none';
+        // const element = document.getElementById('contextMenu');
+        // element.style.display = 'none';
+        // // Workspace.hideContextMenu();
+      }
+    });
+
 
     if (environment.production) {
       // Global function for displaying alert msg during closing and reloading page
@@ -278,23 +300,28 @@ export class SimulatorComponent implements OnInit, OnDestroy {
 
     this.stoggle = !this.stoggle;
     const sim = document.getElementById('console');
-
     // Show Loading Animation
     document.getElementById('simload').style.display = 'block';
 
-    // if status is Stop simulation then console is opened
+    // if status is Stop simulation then console is openedsimulationStarted(true)
     if (!this.stoggle) {
       // Compile code and show loading animation
       sim.style.display = 'block';
       Workspace.CompileCode(this.api, () => {
+        this.hideWorkSpaceService.simulationStarted(false);
+        
         this.disabled = false;
         document.getElementById('simload').style.display = 'none';
       });
     } else {
       // Hide loading animation
-      sim.style.display = 'none';
       Workspace.stopSimulation(() => {
+        // const holder = document.getElementById('holder');
+        // holder.addEventListener('contextmenu',Workspace.contextMenu,true);
+        this.hideWorkSpaceService.simulationStarted(true);
+        // this.hideWorkSpaceService.simulationStarted(true);
         this.disabled = false;
+        
         document.getElementById('simload').style.display = 'none';
       });
     }
@@ -391,7 +418,7 @@ export class SimulatorComponent implements OnInit, OnDestroy {
    * @param key string
    */
   dragStart(event: DragEvent, key: string) {
-    event.dataTransfer.dropEffect = 'copyMove';
+    // event.dataTransfer.dropEffect = 'copyMove';
     event.dataTransfer.setData('text', key);
   }
   /**

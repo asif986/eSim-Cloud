@@ -8,7 +8,8 @@ export class Login {
    * Get Auth Token
    */
   static getToken(): string {
-    return window.localStorage.getItem('esim_token');
+    let token = window.localStorage.getItem('esim_token');
+    return token;
   }
   /**
    * Logout and redirect to home page
@@ -23,7 +24,9 @@ export class Login {
    */
   static redirectLogin(isFront: boolean = false): void {
     const dashboardURI = (new URL(environment.DASHBOARD_URL, window.location.href)).href;
+    console.log(dashboardURI);
     if (Login.getToken()) {
+      console.log("already login" + Login.getToken())
       window.open(dashboardURI, '_self');
     } else {
       let redirectUri = isFront ? dashboardURI : window.location.href;

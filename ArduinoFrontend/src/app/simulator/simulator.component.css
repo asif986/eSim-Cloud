@@ -249,6 +249,14 @@ body {
   display: none;
   background-color: white;
 }
+.context-menu1 {
+  width: 160px;
+  height: 140px;
+  box-shadow: 0 0 5px 0 #ccc;
+  position: absolute;
+  display: block;
+  background-color: white;
+}
 
 .context-menu ul {
   list-style: none;

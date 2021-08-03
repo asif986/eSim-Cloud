@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiService } from '../api.service';
 
 /**
@@ -23,7 +24,7 @@ export class GalleryComponent implements OnInit {
    * Gallery Page Constructor
    * @param api API Service
    */
-  constructor(private api: ApiService) { }
+  constructor(private api: ApiService, private _snackBar: MatSnackBar) { }
 
   /**
    * On Init Page
@@ -52,5 +53,17 @@ export class GalleryComponent implements OnInit {
    */
   DateTime(item) {
     item.time = moment(item.create_time).fromNow();
+  }
+  /**
+   * delete functionality to staff
+   */
+  onDeleteChange(i) {
+    var r = confirm("Want to Delete !");
+    if (r == true) {
+      let newSamples: any[] = this.samples.filter((res, index) => index !== i);
+      this.samples = newSamples;
+    }else{
+      window.open('http://localhost:4200/#/gallery','_self');
+    }
   }
 }

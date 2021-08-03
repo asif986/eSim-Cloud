@@ -19,7 +19,10 @@
               </div>
               <div style="box-sizing: border-box; padding: 15px;">
                 <h5>{{item.name}}</h5>
-                <p style="margin-bottom: 0;text-align: right;font-size: small;">{{item.time}} By {{item.author}}</p>
+                <div style="display: flex;justify-content: space-between;">
+                  <p style="margin-bottom: 0;text-align: right;font-size: small;">{{item.time}} By {{item.author}}</p>
+                  <mat-icon aria-hidden="false" aria-label="Delete" color="warn" (click)="onDeleteChange(i)">delete</mat-icon>
+                </div>  
               </div>
             </div>
           </div>
